@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل دخول</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Cairo', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff, #b794f4, #6d28d9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: auto;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .login-container {
+            background-color: white;
+            border: 2px solid #f1f1f1;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            margin: 140px auto 40px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            font-size: 24px;
+            color: #6d28d9;
+            margin-bottom: 20px;
+        }
+
+        .login-container label {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            font-size: 15px;
+            padding: 12px;
+            border: 2px solid #000000;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .login-container button[type="submit"] {
+            background-color: #6d28d9;
+            color: white;
+            padding: 15px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: opacity 0.3s;
+            width: 100%;
+        }
+
+        .login-container button[type="submit"]:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>تسجيل دخول</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">تسجيل دخول</button>
+        </form>
+    </div>
+</body>
+</html>

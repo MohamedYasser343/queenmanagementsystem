@@ -1,0 +1,195 @@
+<!-- add_cv.html -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add CV</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600&display=swap">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Cairo', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff, #b794f4, #6d28d9); /* Light blue to purple gradient */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-attachment: fixed; /* Ensures the gradient does not restart */
+            animation: backgroundAnimation 5s ease infinite; /* Reduced duration */
+        }
+
+        @keyframes backgroundAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header {
+            background-color: #6d28d9; /* Purple color */
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; /* Original gap between elements */
+            animation: slideInFromTop 0.5s ease-out; /* Reduced duration */
+        }
+
+        @keyframes slideInFromTop {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        header img {
+            width: 45px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        main {
+            padding: 40px 30px; /* Original padding */
+            width: 100%;
+            max-width: 700px;
+            background-color: white;
+            border: 2px solid #f1f1f1;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 160px auto 50px; /* Original margin */
+            animation: fadeIn 0.75s ease-in; /* Reduced duration */
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        label {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            font-size: 16px;
+            padding: 15px;
+            border: 2px solid #000000; /* Black border */
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .field {
+            margin-bottom: 25px;
+        }
+
+        .field input[type="submit"] {
+            background-color: #6d28d9; /* Purple color */
+            color: white;
+            padding: 18px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: opacity 0.3s;
+            width: 100%;
+            animation: bounceIn 0.5s ease; /* Reduced duration */
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .field input[type="submit"]:hover {
+            opacity: 0.8;
+        }
+
+        .back-link {
+            text-align: right;
+            margin-bottom: 25px;
+        }
+
+        .back-link a {
+            color: #6d28d9; /* Purple color */
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        {% load static %}
+        <img src="{% static '/tapp/crown.png' %}" alt="Logo">
+        <h1>إضافة CV</h1>
+    </header>
+
+    <main>
+        <form method="post", enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="field">
+                <input type="submit" value="إضافة CV">
+            </div>
+        </form>
+        <div class="back-link">
+            <a href="{% url 'all_deliveries' %}">ارجع لكل التسلبمات</a>
+        </div>
+    </main>
+</body>
+</html>

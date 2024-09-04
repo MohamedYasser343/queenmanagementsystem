@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>View Entries</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        header {
+            background-color: #6d28d9; /* Purple color */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        header img {
+            width: 50px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        main {
+            padding: 140px 20px 20px; /* Increased top padding to 140px */
+            width: 100%;
+            max-width: 1200px;
+        }
+        .total-price {
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #6d28d9; /* Purple color */
+        }
+        .table-container {
+            background-color: white;
+            border: 2px solid #f1f1f1;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #6d28d9; /* Purple color */
+            color: white;
+        }
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f1f1;
+            text-align: left;
+        }
+        .button-link {
+            background-color: #6d28d9; /* Purple color */
+            color: white;
+            padding: 15px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+        .button-link:hover {
+            opacity: 0.8;
+        }
+        .pagination {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .pagination .step-links {
+            display: inline-block;
+            font-size: 18px;
+            color: #6d28d9; /* Purple color */
+        }
+        .pagination .step-links a {
+            color: #6d28d9; /* Purple color */
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #6d28d9;
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+        .pagination .step-links a:hover {
+            background-color: #6d28d9;
+            color: white;
+        }
+        .pagination .current {
+            padding: 8px 16px;
+            border-radius: 5px;
+            background-color: #6d28d9;
+            color: white;
+            margin: 0 2px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        {% load static %}
+        <a href="{% url 'index' %}">
+            <img src="{% static 'tapp/crown.png' %}" alt="Crown Logo">
+        </a>
+        <h1>قائمة الشغل</h1>
+    </header>
+    <main>
+        <div class="total-price">
+            إجمالي السعر {{ total_price }} جنيه
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الخدمة</th>
+                        <th>السعر</th>
+                        <th>الملاحظات</th>
+                        <th>التاريخ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in page_obj %}
+                    <tr>
+                        <td>{{ entry.name.arabic_name }}</td>  <!-- Display the username from CustomUser -->
+                        <td>{{ entry.service }}</td>
+                        <td>{{ entry.price }} جنيه</td>
+                        <td>{{ entry.comment }}</td>
+                        <td>{{ entry.formatted_timestamp }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">لا يوجد بيانات</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; الأولى</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">السابق</a>
+                {% endif %}
+    
+                <span class="current">
+                    صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                </span>
+    
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">التالي</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">الأخيرة &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="mt-6 text-center">
+            <a href="{% url 'add_entry' %}" class="button-link">
+                أضف شغل
+            </a>
+            <a href="{% url 'index' %}" class="button-link">
+                إرجع للصفحة الرئيسية
+            </a>
+        </div>
+    </main>    
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Queen's System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Cairo', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff, #b794f4, #6d28d9);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #6d28d9;
+            color: white;
+            padding: 15px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            animation: slideDown 0.5s ease-in-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideDown {
+            from { top: -100px; }
+            to { top: 0; }
+        }
+
+        header .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .greeting {
+            background-color: #4c1d95;
+            padding: 10px 15px;
+            border-radius: 12px;
+            color: #f9fafb;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logout-button {
+            background-color: #ef4444;
+            color: white;
+            padding: 15px 25px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #dc2626;
+            transform: scale(1.08);
+        }
+
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1s ease;
+        }
+
+        header img {
+            width: 45px;
+            animation: rotateIn 1s ease;
+        }
+
+        @keyframes rotateIn {
+            from { transform: rotate(-360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #f3e8ff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            animation: zoomIn 0.8s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5); }
+            to { transform: scale(1); }
+        }
+
+        main {
+            text-align: center;
+            padding: 130px 20px 20px;
+            width: 100%;
+        }
+
+        .main-content {
+            background: linear-gradient(135deg, #ffffff, #f3e8ff);
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 420px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .main-content h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #6d28d9;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content .field input[type="button"] {
+            background-color: #6d28d9;
+            color: white;
+            padding: 16px;
+            border: none;
+            font-size: 19px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+            width: 100%;
+            margin-bottom: 14px;
+            animation: slideUp 0.5s ease;
+        }
+
+        .main-content .field input[type="button"]:hover {
+            background-color: #5b21b6;
+            transform: scale(1.05);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            header h1 { font-size: 22px; }
+            header img { width: 40px; }
+            .main-content { padding: 25px; }
+            .main-content h2 { font-size: 20px; }
+            .main-content .field input[type="button"] { padding: 14px; font-size: 17px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="user-section">
+            <span class="greeting">أحلى مسا يا {{ arabic_name }}</span>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">تسجيل خروج</button>
+            </form>
+        </div>
+        {% load static %}
+        <div class="center-content">
+            <img src="{% static 'tapp/crown.png' %}" alt="Crown Logo">
+            <h1>سايبر كوين</h1>
+        </div>
+    </header>
+    <main>
+        <div class="main-content">
+            <h2>أحلى مسا عالناس الكويسة</h2>
+            <div class="field">
+                <input type="button" value="ضيف شغل" onclick="location.href='{% url 'add_entry' %}'">
+            </div>
+            <div class="field">
+                <input type="button" value="تسليمات" onclick="location.href='{% url 'all_deliveries' %}'">
+            </div>
+            <div class="field">
+                <input type="button" value="شوف شغلك" onclick="location.href='{% url 'view_entries' %}'">
+            </div>
+            <div class="field">
+                <input type="button" value="العملاء" onclick="location.href='{% url 'view_customers' %}'">
+            </div>
+            <div class="field">
+                <input type="button" value="الأرشيف (لسه)" onclick="location.href='#'">
+            </div>
+            <div class="field">
+                <input type="button" value="المخزن (لسه)" onclick="location.href='#'">
+            </div>
+        </div>
+    </main>
+</body>
+</html>

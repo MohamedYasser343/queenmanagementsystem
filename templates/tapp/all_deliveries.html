@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Deliveries</title>
+    <style>
+        body {
+            font-family: 'Cairo', Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff, #b794f4, #6d28d9);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow-y: auto;
+            background-attachment: fixed;
+        }
+        header {
+            background-color: #4c1d95;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        header img {
+            width: 40px;
+            height: auto;
+            margin-right: 15px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        main {
+            padding: 100px 20px 40px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .table-container {
+            background-color: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .table-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            text-align: center;
+            color: #4c1d95;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        thead {
+            background-color: #6d28d9;
+            color: white;
+        }
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            font-weight: bold;
+        }
+        tbody tr:hover {
+            background-color: #f3e8ff;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        .delete-button {
+            background-color: #e53e3e;
+        }
+        .delete-button:hover {
+            background-color: #c53030;
+        }
+        .edit-button {
+            background-color: #38a169;
+        }
+        .edit-button:hover {
+            background-color: #2f855a;
+        }
+        .return-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .return-buttons a {
+            background-color: #6d28d9;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .return-buttons a:hover {
+            background-color: #4a1a9e;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        {% load static %}
+        <img src="{% static 'tapp/crown.png' %}" alt="Logo">
+        <h1>قايمة التسليمات</h1>
+    </header>
+    <main>
+        <div class="table-container">
+            <h2>CVs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>اسم المستلم</th>
+                        <th>اللغة</th>
+                        <th>السعر</th>
+                        <th>المبلغ المدفوع</th>
+                        <th>المبلغ المتبقي</th>
+                        <th>الحالة</th>
+                        <th>وقت الاستلام</th>
+                        <th>وقت التسليم</th>
+                        <th>الملف</th>
+                        <th>الإجراءات</th>
+                        <th>النقط</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cv in cvs %}
+                    <tr>
+                        <td>{{ cv.name.arabic_name }}</td>
+                        <td>{{ cv.recipient_name }}</td>
+                        <td>{{ cv.language }}</td>
+                        <td>{{ cv.price }}</td>
+                        <td>{{ cv.paid_money }}</td>
+                        <td>{{ cv.rest_money }}</td>
+                        <td>{{ cv.status }}</td>
+                        <td>{{ cv.formatted_timestamp }}</td>
+                        <td>{{ cv.delivery_time }}</td>
+                        <td>
+                            {% if cv.file %}
+                            <a href="/queen/deliveries/{{ cv.file.name }}" target="_blank" rel="noopener noreferrer">فتح الملف</a>
+                            {% else %}
+                            لم يتم رفع الملف
+                            {% endif %}
+                        </td>                        
+                        <td>
+                            <div class="actions">
+                                <form action="{% url 'delete_cv' cv.id %}" method="post" onsubmit="return confirmDelete()">
+                                    {% csrf_token %}
+                                    <button class="button delete-button" type="submit">حذف</button>
+                                </form>
+                                <a href="{% url 'edit_cv' cv.id %}" class="button edit-button">تعديل</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="return-buttons">
+                <a href="{% url 'add_cv' %}">إضافة CV</a>
+                <a href="{% url 'index' %}">الرجوع للصفحة الرئيسية</a>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h2>الكتابة</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>اسم المستلم</th>
+                        <th>عدد الأوراق</th>
+                        <th>السعر</th>
+                        <th>المبلغ المدفوع</th>
+                        <th>المبلغ المتبقي</th>
+                        <th>الحالة</th>
+                        <th>وقت الاستلام</th>
+                        <th>وقت التسليم</th>
+                        <th>الملف</th>
+                        <th>الإجراءات</th>
+                        <th>النقط</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for writing in writings %}
+                    <tr>
+                        <td>{{ writing.name.arabic_name }}</td>
+                        <td>{{ writing.recipient_name }}</td>
+                        <td>{{ writing.paper_number }}</td>
+                        <td>{{ writing.price }}</td>
+                        <td>{{ writing.paid_money }}</td>
+                        <td>{{ writing.rest_money }}</td>
+                        <td>{{ writing.status }}</td>
+                        <td>{{ writing.formatted_timestamp }}</td>
+                        <td>{{ writing.delivery_time }}</td>
+                        <td>
+                            {% if writing.file %}
+                            <a href="/queen/deliveries/{{ writing.file.name }}" target="_blank" rel="noopener noreferrer">فتح الملف</a>
+                            {% else %}
+                            لم يتم رفع الملف
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <form action="{% url 'delete_writing' writing.id %}" method="post" onsubmit="return confirmDelete()">
+                                    {% csrf_token %}
+                                    <button class="button delete-button" type="submit">حذف</button>
+                                </form>
+                                <a href="{% url 'edit_writing' writing.id %}" class="button edit-button">تعديل</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="return-buttons">
+                <a href="{% url 'add_writing' %}">إضافة كتابة</a>
+                <a href="{% url 'index' %}">الرجوع للصفحة الرئيسية</a>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h2>التصوير</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>اسم المستلم</th>
+                        <th>عدد الأوراق</th>
+                        <th>السعر</th>
+                        <th>المبلغ المدفوع</th>
+                        <th>المبلغ المتبقي</th>
+                        <th>الحالة</th>
+                        <th>وقت الاستلام</th>
+                        <th>وقت التسليم</th>
+                        <th>الإجراءات</th>
+                        <th>النقط</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for copying in copyings %}
+                    <tr>
+                        <td>{{ copying.name.arabic_name }}</td>
+                        <td>{{ copying.recipient_name }}</td>
+                        <td>{{ copying.paper_number }}</td>
+                        <td>{{ copying.price }}</td>
+                        <td>{{ copying.paid_money }}</td>
+                        <td>{{ copying.rest_money }}</td>
+                        <td>{{ copying.status }}</td>
+                        <td>{{ copying.formatted_timestamp }}</td>
+                        <td>{{ copying.delivery_time }}</td>
+                        <td>
+                            <div class="actions">
+                                <form action="{% url 'delete_copying' copying.id %}" method="post" onsubmit="return confirmDelete()">
+                                    {% csrf_token %}
+                                    <button class="button delete-button" type="submit">حذف</button>
+                                </form>
+                                <a href="{% url 'edit_copying' copying.id %}" class="button edit-button">تعديل</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="return-buttons">
+                <a href="{% url 'add_copying' %}">إضافة تصوير</a>
+                <a href="{% url 'index' %}">الرجوع للصفحة الرئيسية</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function confirmDelete() {
+            return confirm('هل أنت متاكد من حذف هذا العنصر؟');
+        }
+    </script>
+</body>
+</html>
