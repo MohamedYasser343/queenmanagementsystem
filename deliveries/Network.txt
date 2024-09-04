@@ -1,0 +1,8 @@
+webUsername: admin
+webPassword: K9447031
+
+SSID: CyberQueen
+PassWord: Queen@#1011
+IPv4: 156.194.83.40
+MAC Address: B4:F5:8E:76:C7:B5
+
