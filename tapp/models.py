@@ -42,6 +42,7 @@ class Entry(models.Model):
     comment = models.TextField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     points = models.IntegerField()
+    customer = models.ForeignKey('Customers', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.service}"
