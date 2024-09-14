@@ -76,8 +76,9 @@ class CopyingForm(forms.ModelForm):
 class EntryForm(forms.ModelForm):
     class Meta:
         model = Entry
-        fields = ['service', 'face_type', 'color', 'number', 'price', 'comment',]
+        fields = ['customer', 'service', 'face_type', 'color', 'number', 'price', 'comment',]
         labels = {
+            'customer': 'العميل',
             'service': 'الخدمة',
             'face_type': 'نوع الوش',
             'color': 'اللون',

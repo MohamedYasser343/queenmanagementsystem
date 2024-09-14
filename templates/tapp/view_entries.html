@@ -206,6 +206,7 @@
                 <thead>
                     <tr>
                         <th>الاسم</th>
+                        <th>العميل</th>
                         <th>الخدمة</th>
                         <th>اللون</th>
                         <th>نوع الوش</th>
@@ -221,6 +222,7 @@
                     {% for entry in page_obj %}
                     <tr>
                         <td>{{ entry.name.arabic_name }}</td>    
+                        <td>{{ entry.customer }}</td>
                         <td>{{ entry.service }}</td>
                         <td>
                             {% if entry.face_color == None %}
