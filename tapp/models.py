@@ -54,7 +54,7 @@ class Entry(models.Model):
     def save(self, *args, **kwargs):
         service_points = {
             'طباعة': 1,     # Printing
-            'تصوير': 3,     # Copying
+            'تصوير': 2,     # Copying
             'سكان': 3,      # Scanning
             'تقديم': 5,     # Submission
             'أخرى': 2       # Other
