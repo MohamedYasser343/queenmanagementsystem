@@ -134,8 +134,14 @@ def edit_deliverable(request, model_class, form_class, template_name, deliverabl
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES, instance=deliverable)
         if form.is_valid():
-            if form.cleaned_data.get('status') == 'اتعمل' and not form.cleaned_data.get('file'):
-                form.add_error('file', 'File upload is required when status is "done".')
+            # Check if the service is not 'copying' and the status is 'done'
+            if form.cleaned_data.get('service') != 'تصوير' and form.cleaned_data.get('status') == 'اتعمل':
+                # Check if 'file' field exists in the form
+                if 'file' in form.fields and not form.cleaned_data.get('file'):
+                    form.add_error('file', 'File upload is required when status is "done".')
+                else:
+                    form.save()
+                    return redirect('all_deliveries')
             else:
                 form.save()
                 return redirect('all_deliveries')
@@ -143,6 +149,7 @@ def edit_deliverable(request, model_class, form_class, template_name, deliverabl
         form = form_class(instance=deliverable)
 
     return render(request, template_name, {'form': form, 'deliverable': deliverable})
+
 
 @login_required
 def delete_deliverable(request, model_class, deliverable_id):
