@@ -222,7 +222,13 @@
                     {% for entry in page_obj %}
                     <tr>
                         <td>{{ entry.name.arabic_name }}</td>    
-                        <td>{{ entry.customer }}</td>
+                        <td>
+                            {% if entry.customer == None %}
+                            لا يوجد
+                            {% else %}
+                            {{ entry.customer }}
+                            {% endif %}
+                        </td>
                         <td>{{ entry.service }}</td>
                         <td>
                             {% if entry.face_color == None %}

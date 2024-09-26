@@ -50,6 +50,12 @@ def add_entry(request):
             user.points = F('points') + entry.points
             user.save()
 
+            # add one point to customer
+            if entry.customer:
+                customer = entry.customer
+                customer.points = F('points') + 1
+                customer.save()
+
             return redirect('view_entries')
     else:
         form = form_class()
