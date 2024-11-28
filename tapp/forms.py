@@ -1,5 +1,5 @@
 from django import forms
-from .models import CVs, Customers, Writing, Copying, Entry, Deliveries
+from .models import CVs, Customers, Storage, Writing, Copying, Entry, Deliveries
 
 class CVsForm(forms.ModelForm):
     class Meta:
@@ -76,12 +76,13 @@ class CopyingForm(forms.ModelForm):
 class EntryForm(forms.ModelForm):
     class Meta:
         model = Entry
-        fields = ['customer', 'service', 'face_type', 'color', 'number', 'price', 'comment',]
+        fields = ['customer', 'service', 'face_type', 'color', 'storage_items', 'number', 'price', 'comment',]
         labels = {
             'customer': 'العميل',
             'service': 'الخدمة',
             'face_type': 'نوع الوش',
             'color': 'اللون',
+            'storage_items': 'المخزن',
             'number': 'العدد',
             'price': 'السعر',
             'comment': 'تعليق',
@@ -93,6 +94,7 @@ class EntryForm(forms.ModelForm):
         face_type = cleaned_data.get('face_type')
         color = cleaned_data.get('color')
         number = cleaned_data.get('number')
+        price = cleaned_data.get('price')
         comment = cleaned_data.get('comment')
 
         if service in ['طباعة', 'تصوير']:
@@ -110,7 +112,13 @@ class EntryForm(forms.ModelForm):
         elif service == 'تقديم':
             if face_type or color or number:
                 raise forms.ValidationError('متدخلش عدد الورق ولا لونه ولا نوع الوش مع التقديم')
-        
+            
+        elif service == 'بضاعة':
+            if face_type or color or price:
+                raise forms.ValidationError('متدخلش حاجة غير العدد بس')
+            if number is None:
+                raise forms.ValidationError('دخل العدد')
+            
         elif service == 'أخرى':
             if not comment:
                 raise forms.ValidationError('اكتب الخدمة في جزء التعليق')
@@ -123,4 +131,14 @@ class CustomerForm(forms.ModelForm):
         labels = {
             'name': 'الاسم',
             'phone': 'رقم الهاتف',
+        }
+
+class StorageForm(forms.ModelForm):
+    class Meta:
+        model = Storage
+        fields = ['name', 'price', 'quantity']
+        labels = {
+            'name': 'الاسم',
+            'price': 'السعر',
+            'quantity': 'الكمية',
         }

@@ -7,8 +7,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.db.models import Sum, F
 
-from tapp.forms import CVsForm, CopyingForm, CustomerForm, WritingForm, EntryForm
-from .models import CVs, Copying, Customers, Entry, Writing
+from tapp.forms import CVsForm, CopyingForm, CustomerForm, StorageForm, WritingForm, EntryForm
+from .models import CVs, Copying, Customers, Entry, Storage, Writing
 
 @login_required
 def index(request):
@@ -49,6 +49,10 @@ def add_entry(request):
             user = request.user
             user.points = F('points') + entry.points
             user.save()
+
+            storage = request.user.storage
+            storage.quantity = F('quantity') - entry.numeber
+            storage.save()
 
             # add one point to customer
             if entry.customer:
@@ -221,3 +225,25 @@ def delete_customer(request, customer_id):
         customer.delete()
         return redirect('view_customers')
     return HttpResponseForbidden("Method not allowed")
+
+@login_required
+def view_storage(request):
+    storage = Storage.objects.all().order_by('-id')
+    paginator = Paginator(storage, 10)  # Paginate with 10 customers per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'tapp/view_storage.html', {
+        'page_obj': page_obj,
+    })
+
+@login_required
+def add_storage(request):
+    if request.method == 'POST':
+        form = StorageForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('view_storage')
+    else:
+        form  = StorageForm()
+    return render(request, 'tapp/add_storage.html', {'form': form})

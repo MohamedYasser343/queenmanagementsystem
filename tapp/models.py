@@ -21,6 +21,7 @@ class Entry(models.Model):
         ('تصوير', 'تصوير'),
         ('سكان', 'سكان'),
         ('تقديم', 'تقديم'),
+        ('بضاعة', 'بضاعة'),
         ('أخرى', 'أخرى'),
     ]
     FACE_TYPE_CHOICES = [
@@ -37,6 +38,7 @@ class Entry(models.Model):
     service = models.CharField(max_length=10, choices=SERVICE_CHOICES)
     face_type = models.CharField(max_length=50, choices=FACE_TYPE_CHOICES, blank=True, null=True)
     color = models.CharField(max_length=50, choices=COLOR_CHOICES, blank=True, null=True)
+    storage_items = models.ForeignKey('Storage', on_delete=models.CASCADE, blank=True, null=True)
     number = models.IntegerField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=False)
     comment = models.TextField(blank=True, null=True)
@@ -57,6 +59,7 @@ class Entry(models.Model):
             'تصوير': 2,     # Copying
             'سكان': 3,      # Scanning
             'تقديم': 5,     # Submission
+            'بضاعة': 1,     # Storage
             'أخرى': 2       # Other
         }
         self.points = service_points.get(self.service, 0)
@@ -110,6 +113,14 @@ class Customers(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
     points = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class Storage(models.Model):
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
