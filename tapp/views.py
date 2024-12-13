@@ -260,13 +260,24 @@ def delete_storage(request, storage_id):
 # view selled items from storage
 @login_required
 def view_selled_items(request):
-    selled_items = SelledItems.objects.all().order_by('-id')
+    today = timezone.now().date()
+    selled_items = SelledItems.objects.filter(
+        timestamp__date=today
+    ).order_by('-timestamp')
+
+    result = SelledItems.objects.filter(
+        timestamp__date=today
+    ).aggregate(total_price=Sum('price')) or 0
+    total_price = result.get('total_price', 0)
+    total_price = int(total_price) if total_price else 0
+
     paginator = Paginator(selled_items, 10)  # Paginate with 10 customers per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'tapp/view_selled_items.html', {
         'page_obj': page_obj,
+        'total_price': total_price
     })
 
 @login_required

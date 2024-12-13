@@ -198,7 +198,7 @@
     <main>
         <div class="total-price-box">
             <span>إجمالي: </span>
-            <span class="total-price">{{ total_price }}</span>
+            <span class="total-price">{{ total_price }} جنيه</span>
             <span></span>
         </div>
         <div class="table-container">
@@ -208,6 +208,7 @@
                         <th>الاسم</th>
                         <th>العدد المباع</th>
                         <th>السعر</th>
+                        <th>الوقت</th>
                         {% comment %} <th>إجراءات</th> {% endcomment %}
                     </tr>
                 </thead>
@@ -217,6 +218,7 @@
                         <td>{{ entry.item.name }}</td>    
                         <td>{{ entry.quantity }}</td>
                         <td>{{ entry.price }} جنيه</td>
+                        <td>{{ entry.timestamp }}</td>
                         {% comment %} <td>
                             <form action="{% url 'delete_storage' entry.id %}" method="post">
                                 {% csrf_token %}
