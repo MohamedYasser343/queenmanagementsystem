@@ -7,8 +7,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.db.models import Sum, F
 
-from tapp.forms import CVsForm, CopyingForm, CustomerForm, StorageForm, WritingForm, EntryForm
-from .models import CVs, Copying, Customers, Entry, Storage, Writing
+from tapp.forms import CVsForm, CopyingForm, CustomerForm, SelledItemsForm, StorageForm, WritingForm, EntryForm
+from .models import CVs, Copying, Customers, Entry, SelledItems, Storage, Writing
 
 @login_required
 def index(request):
@@ -255,3 +255,33 @@ def delete_storage(request, storage_id):
         storage.delete()
         return redirect('view_storage')
     return HttpResponseForbidden("Method not allowed")
+
+
+# view selled items from storage
+@login_required
+def view_selled_items(request):
+    selled_items = SelledItems.objects.all().order_by('-id')
+    paginator = Paginator(selled_items, 10)  # Paginate with 10 customers per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'tapp/view_selled_items.html', {
+        'page_obj': page_obj,
+    })
+
+@login_required
+def add_selled_item(request):
+    if request.method == 'POST':
+        form = SelledItemsForm(request.POST)
+        if form.is_valid():
+            selled_item = form.save(commit=False)  # Do not save to the database yet
+            storage_item = get_object_or_404(Storage, id=selled_item.item.id)
+            selled_item.price = storage_item.price * selled_item.quantity
+            storage_item.quantity = F('quantity') - selled_item.quantity
+
+            storage_item.save()
+            selled_item.save()
+            return redirect('view_selled_items')
+    else:
+        form = SelledItemsForm()
+    return render(request, 'tapp/add_selled_item.html', {'form': form})

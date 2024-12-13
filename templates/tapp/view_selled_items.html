@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>عرض البضاعة المباعة</title>
+    <style>
+        body {
+            font-family: 'Cairo', Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff, #b794f4, #6d28d9);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow-y: auto;
+            background-attachment: fixed;
+            transition: background 0.3s ease-in-out;
+        }
+        header {
+            background-color: #6d28d9;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+        }
+        header img {
+            width: 40px;
+            height: auto;
+            transition: transform 0.3s ease-in-out;
+        }
+        header img:hover {
+            transform: scale(1.2);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            transition: color 0.3s ease-in-out;
+        }
+        header h1:hover {
+            color: #ddd6fe;
+        }
+        main {
+            padding: 80px 20px 20px;
+            width: 100%;
+            max-width: 1200px;
+            transition: transform 0.3s ease-in-out;
+        }
+        .total-price-box {
+            background-color: #4c1d95;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 300px;
+            margin: 20px auto;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .total-price-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .total-price {
+            font-size: 30px;
+        }
+        .table-container {
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin: 0 auto;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .table-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        thead {
+            background-color: #4c1d95;
+            color: white;
+        }
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: center;
+            transition: background-color 0.3s ease-in-out;
+        }
+        th:hover, td:hover {
+            background-color: #f3e8ff;
+        }
+        th {
+            font-weight: bold;
+        }
+        .button-link {
+            background-color: #4c1d95;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .button-link:hover {
+            background-color: #3b1273;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .pagination {
+            margin: 20px 0;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-in-out;
+        }
+        @keyframes fadeInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .pagination .step-links {
+            display: inline-block;
+            font-size: 18px;
+            color: #4c1d95;
+        }
+        .pagination .step-links a {
+            color: #4c1d95;
+            padding: 10px 18px;
+            text-decoration: none;
+            border: 1px solid #4c1d95;
+            border-radius: 5px;
+            margin: 0 2px;
+            transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .pagination .step-links a:hover {
+            background-color: #4c1d95;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .pagination .current {
+            padding: 10px 18px;
+            border-radius: 5px;
+            background-color: #4c1d95;
+            color: white;
+            margin: 0 2px;
+            display: inline-block;
+        }
+        .delete-button {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .delete-button:hover {
+            background-color: #c53030;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        {% load static %}
+        <img src="{% static 'tapp/crown.png' %}" alt="Logo">
+        <h1>البضاعة المباعة</h1>
+    </header>
+
+    <main>
+        <div class="total-price-box">
+            <span>إجمالي: </span>
+            <span class="total-price">{{ total_price }}</span>
+            <span></span>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>العدد المباع</th>
+                        <th>السعر</th>
+                        {% comment %} <th>إجراءات</th> {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in page_obj %}
+                    <tr>
+                        <td>{{ entry.item.name }}</td>    
+                        <td>{{ entry.quantity }}</td>
+                        <td>{{ entry.price }} جنيه</td>
+                        {% comment %} <td>
+                            <form action="{% url 'delete_storage' entry.id %}" method="post">
+                                {% csrf_token %}
+                                <button class="delete-button" type="submit">حذف</button>
+                            </form>
+                        </td> {% endcomment %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; الأول</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">السابق</a>
+                    {% endif %}
+                    <span class="current">
+                        الصفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">التالي</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">الأخير &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="action-buttons">
+                <a href="{% url 'add_selled_item' %}" class="button-link">إضافة جديد</a>
+                <a href="{% url 'index' %}" class="button-link">العودة للصفحة الرئيسية</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

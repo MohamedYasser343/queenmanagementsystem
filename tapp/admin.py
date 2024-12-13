@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Entry
+from .models import CustomUser, Entry, SelledItems, Storage
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
@@ -25,4 +25,6 @@ class CustomUserAdmin(UserAdmin):
     filter_horizontal = ()
 
 admin.site.register(Entry)
+admin.site.register(Storage)
+admin.site.register(SelledItems)
 admin.site.register(CustomUser, CustomUserAdmin)

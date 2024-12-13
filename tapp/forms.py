@@ -1,5 +1,5 @@
 from django import forms
-from .models import CVs, Customers, Storage, Writing, Copying, Entry, Deliveries
+from .models import CVs, Customers, SelledItems, Storage, Writing, Copying, Entry, Deliveries
 
 class CVsForm(forms.ModelForm):
     class Meta:
@@ -140,5 +140,14 @@ class StorageForm(forms.ModelForm):
         labels = {
             'name': 'الاسم',
             'price': 'السعر',
+            'quantity': 'الكمية',
+        }
+
+class SelledItemsForm(forms.ModelForm):
+    class Meta:
+        model = SelledItems
+        fields = ['item', 'quantity']
+        labels = {
+            'item': 'الاسم',
             'quantity': 'الكمية',
         }

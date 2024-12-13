@@ -6,10 +6,10 @@ from django.views.static import serve
 from queenBackend import settings
 from queenBackend import settings
 from .views import (
-    CustomLoginView, CustomLogoutView, add_copying, add_customer, add_cv, add_storage, add_writing,
+    CustomLoginView, CustomLogoutView, add_copying, add_customer, add_cv, add_selled_item, add_storage, add_writing,
     all_deliveries, delete_copying, delete_customer, delete_cv, delete_storage, delete_writing, edit_copying,
     edit_cv, edit_writing, index, admin_only_view, view_customers, view_entries,
-    add_entry, delete_entry, view_storage,
+    add_entry, delete_entry, view_selled_items, view_storage,
 )
 
 urlpatterns = [
@@ -42,6 +42,9 @@ urlpatterns = [
     path('storage/', view_storage, name='view_storage'),
     path('storage/add', add_storage, name='add_storage'),
     path('storage/delete/<int:storage_id>/', delete_storage, name='delete_storage'),
+
+    path('selledItems/', view_selled_items, name='view_selled_items'),
+    path('selledItems/add', add_selled_item, name='add_selled_item'),
 ]
 
 urlpatterns += static('deliveries/', document_root=os.path.join(settings.BASE_DIR, ''))
