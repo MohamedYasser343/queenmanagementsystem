@@ -247,3 +247,11 @@ def add_storage(request):
     else:
         form  = StorageForm()
     return render(request, 'tapp/add_storage.html', {'form': form})
+
+@login_required
+def delete_storage(request, storage_id):
+    if request.method == 'POST':
+        storage = get_object_or_404(Storage, id=storage_id)
+        storage.delete()
+        return redirect('view_storage')
+    return HttpResponseForbidden("Method not allowed")
