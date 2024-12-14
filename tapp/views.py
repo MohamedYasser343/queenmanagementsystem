@@ -287,9 +287,13 @@ def add_selled_item(request):
         if form.is_valid():
             selled_item = form.save(commit=False)  # Do not save to the database yet
             storage_item = get_object_or_404(Storage, id=selled_item.item.id)
+            new_quantity = storage_item.quantity - selled_item.quantity
+
+            if new_quantity < 0:
+                return HttpResponseForbidden("Not enough items in storage")
+
             selled_item.price = storage_item.price * selled_item.quantity
             storage_item.quantity = F('quantity') - selled_item.quantity
-
             storage_item.save()
             selled_item.save()
             return redirect('view_selled_items')
