@@ -285,7 +285,7 @@ def add_selled_item(request):
     if request.method == 'POST':
         form = SelledItemsForm(request.POST)
         if form.is_valid():
-            selled_item = form.save(commit=False)  # Do not save to the database yet
+            selled_item = form.save(commit=False)
             storage_item = get_object_or_404(Storage, id=selled_item.item.id)
             new_quantity = storage_item.quantity - selled_item.quantity
 
