@@ -134,6 +134,9 @@ class CustomerForm(forms.ModelForm):
         }
 
 class StorageForm(forms.ModelForm):
+    """
+    Form for adding or editing storage items.
+    """
     class Meta:
         model = Storage
         fields = ['name', 'price', 'quantity']
@@ -142,8 +145,35 @@ class StorageForm(forms.ModelForm):
             'price': 'السعر',
             'quantity': 'الكمية',
         }
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'أدخل اسم العنصر'}),
+            'price': forms.NumberInput(attrs={'placeholder': 'أدخل السعر'}),
+            'quantity': forms.NumberInput(attrs={'placeholder': 'أدخل الكمية'}),
+        }
+
+    def clean_quantity(self):
+        """
+        Ensure quantity is not negative.
+        """
+        quantity = self.cleaned_data.get('quantity')
+        if quantity < 0:
+            raise forms.ValidationError("الكمية لا يمكن أن تكون سلبية.")
+        return quantity
+
+    def clean_price(self):
+        """
+        Ensure price is not negative or zero.
+        """
+        price = self.cleaned_data.get('price')
+        if price <= 0:
+            raise forms.ValidationError("السعر يجب أن يكون أكبر من الصفر.")
+        return price
+
 
 class SelledItemsForm(forms.ModelForm):
+    """
+    Form for adding sold items.
+    """
     class Meta:
         model = SelledItems
         fields = ['item', 'quantity']
@@ -151,3 +181,28 @@ class SelledItemsForm(forms.ModelForm):
             'item': 'الاسم',
             'quantity': 'الكمية',
         }
+        widgets = {
+            'item': forms.Select(attrs={'class': 'form-control'}),
+            'quantity': forms.NumberInput(attrs={'placeholder': 'أدخل الكمية المباعة'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Limit item choices to those with stock available
+        self.fields['item'].queryset = Storage.objects.filter(quantity__gt=0)
+
+    def clean_quantity(self):
+        """
+        Ensure the sold quantity is valid and doesn't exceed available stock.
+        """
+        quantity = self.cleaned_data.get('quantity')
+        item = self.cleaned_data.get('item')
+
+        if quantity <= 0:
+            raise forms.ValidationError("الكمية يجب أن تكون أكبر من الصفر.")
+        
+        if item and quantity > item.quantity:
+            raise forms.ValidationError(
+                f"الكمية المطلوبة ({quantity}) أكبر من المتوفر ({item.quantity})."
+            )
+        return quantity

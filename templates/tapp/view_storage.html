@@ -208,7 +208,7 @@
                         <th>الاسم</th>
                         <th>السعر</th>
                         <th>العدد الباقي</th>
-                        <th>إجراءات</th>
+                        {% comment %} <th>إجراءات</th> {% endcomment %}
                     </tr>
                 </thead>
                 <tbody>
@@ -217,12 +217,12 @@
                         <td>{{ entry.name }}</td>    
                         <td>{{ entry.price }} جنيه</td>
                         <td>{{ entry.quantity }}</td>
-                        <td>
+                        {% comment %} <td>
                             <form action="{% url 'delete_storage' entry.id %}" method="post">
                                 {% csrf_token %}
                                 <button class="delete-button" type="submit">حذف</button>
                             </form>
-                        </td>
+                        </td> {% endcomment %}
                     </tr>
                     {% endfor %}
                 </tbody>

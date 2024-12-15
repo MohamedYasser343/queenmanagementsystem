@@ -181,11 +181,31 @@
     <main>
         <form method="post", enctype="multipart/form-data">
             {% csrf_token %}
+            <label for="search-item">ابحث عن العنصر:</label>
+            <input type="text" id="search-item" placeholder="ابحث في القائمة...">
             {{ form.as_p }}
             <div class="field">
                 <input type="submit" value="إضافة لمخزن">
             </div>
         </form>
     </main>
+    <script>
+        // JavaScript to filter dropdown options
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-item');
+            const selectElement = document.querySelector('select[name="item"]');
+            
+            searchInput.addEventListener('input', function() {
+                const filter = searchInput.value.toLowerCase();
+                const options = selectElement.options;
+    
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    const text = option.text.toLowerCase();
+                    option.style.display = text.includes(filter) ? '' : 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

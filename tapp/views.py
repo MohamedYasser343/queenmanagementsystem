@@ -226,10 +226,24 @@ def delete_customer(request, customer_id):
         return redirect('view_customers')
     return HttpResponseForbidden("Method not allowed")
 
+from django.contrib import messages
+from django.db.models import F, Sum
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
+from django.core.paginator import Paginator
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from .forms import StorageForm, SelledItemsForm
+from .models import Storage, SelledItems
+
+
 @login_required
 def view_storage(request):
+    """
+    View to display the list of storage items with pagination.
+    """
     storage = Storage.objects.all().order_by('-id')
-    paginator = Paginator(storage, 10)  # Paginate with 10 customers per page
+    paginator = Paginator(storage, 10)  # Paginate with 10 items per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -237,41 +251,56 @@ def view_storage(request):
         'page_obj': page_obj,
     })
 
+
 @login_required
 def add_storage(request):
+    """
+    View to add a new storage item.
+    """
     if request.method == 'POST':
         form = StorageForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Storage item added successfully.")
             return redirect('view_storage')
+        else:
+            messages.error(request, "Error adding storage item. Please correct the form.")
     else:
-        form  = StorageForm()
+        form = StorageForm()
+
     return render(request, 'tapp/add_storage.html', {'form': form})
+
 
 @login_required
 def delete_storage(request, storage_id):
+    """
+    View to delete a storage item.
+    """
     if request.method == 'POST':
         storage = get_object_or_404(Storage, id=storage_id)
+        if storage.quantity > 0:
+            messages.error(request, f"Cannot delete '{storage.name}' because it has stock remaining.")
+            return redirect('view_storage')
         storage.delete()
+        messages.success(request, f"Storage item '{storage.name}' deleted successfully.")
         return redirect('view_storage')
     return HttpResponseForbidden("Method not allowed")
 
 
-# view selled items from storage
 @login_required
 def view_selled_items(request):
+    """
+    View to display the list of sold items for today with pagination and total sales price.
+    """
     today = timezone.now().date()
     selled_items = SelledItems.objects.filter(
         timestamp__date=today
     ).order_by('-timestamp')
 
-    result = SelledItems.objects.filter(
-        timestamp__date=today
-    ).aggregate(total_price=Sum('price')) or 0
-    total_price = result.get('total_price', 0)
-    total_price = int(total_price) if total_price else 0
+    # Calculate total price for today's sales
+    total_price = selled_items.aggregate(total_price=Sum('price'))['total_price'] or 0
 
-    paginator = Paginator(selled_items, 10)  # Paginate with 10 customers per page
+    paginator = Paginator(selled_items, 10)  # Paginate with 10 items per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -280,23 +309,38 @@ def view_selled_items(request):
         'total_price': total_price
     })
 
+
 @login_required
 def add_selled_item(request):
+    """
+    View to add a new sold item.
+    """
     if request.method == 'POST':
         form = SelledItemsForm(request.POST)
         if form.is_valid():
             selled_item = form.save(commit=False)
             storage_item = get_object_or_404(Storage, id=selled_item.item.id)
-            new_quantity = storage_item.quantity - selled_item.quantity
 
-            if new_quantity < 0:
-                return HttpResponseForbidden("Not enough items in storage")
+            if storage_item.quantity < selled_item.quantity:
+                messages.error(
+                    request, 
+                    f"Not enough stock for '{storage_item.name}'. Available: {storage_item.quantity}, Requested: {selled_item.quantity}."
+                )
+                return redirect('add_selled_item')
 
             selled_item.price = storage_item.price * selled_item.quantity
-            storage_item.quantity = F('quantity') - selled_item.quantity
-            storage_item.save()
+
+            # Update storage quantity atomically
+            Storage.objects.filter(id=storage_item.id).update(
+                quantity=F('quantity') - selled_item.quantity
+            )
+
             selled_item.save()
+            messages.success(request, "Sale recorded successfully.")
             return redirect('view_selled_items')
+        else:
+            messages.error(request, "Error saving the sold item. Please correct the form.")
     else:
         form = SelledItemsForm()
+
     return render(request, 'tapp/add_selled_item.html', {'form': form})

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.forms import ValidationError
 
 from queenBackend import settings
 
@@ -10,7 +11,7 @@ class CustomUser(AbstractUser):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='normal')
     points = models.IntegerField(default=0)
-    arabic_name = models.CharField(max_length=255, blank=True, null=True)
+    arabic_name = models.CharField(max_length=255, blank=True, default='')
 
     def __str__(self):
         return self.username
@@ -118,23 +119,65 @@ class Customers(models.Model):
         return self.name
 
 class Storage(models.Model):
-    name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField(default=0)
+    name = models.CharField(max_length=100, unique=True, verbose_name="Item Name")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Unit Price")
+    quantity = models.IntegerField(default=0, verbose_name="Quantity in Stock")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} (Stock: {self.quantity})"
+
+    def clean(self):
+        if self.price < 0:
+            raise ValidationError("Price cannot be negative.")
+        if self.quantity < 0:
+            raise ValidationError("Quantity cannot be negative.")
+
+    def total_value(self):
+        """
+        Calculates the total value of the items in stock.
+        """
+        return self.price * self.quantity
+
+    class Meta:
+        verbose_name = "Storage Item"
+        verbose_name_plural = "Storage Items"
+        ordering = ['name']
+
 
 class SelledItems(models.Model):
-    item = models.ForeignKey(Storage, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    item = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name="sales", verbose_name="Sold Item")
+    quantity = models.IntegerField(default=0, verbose_name="Quantity Sold")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total Price")
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Sale Timestamp")
 
     def __str__(self):
-        return self.item.name
-    
+        return f"Sold {self.quantity} of {self.item.name} on {self.timestamp.strftime('%Y-%m-%d')}"
+
+    def clean(self):
+        if self.quantity < 0:
+            raise ValidationError("Quantity sold cannot be negative.")
+        if self.price is not None and self.price < 0:
+            raise ValidationError("Total price cannot be negative.")
+        if self.item and self.quantity > self.item.quantity:
+            raise ValidationError(f"Insufficient stock for item '{self.item.name}'. Available: {self.item.quantity}, Requested: {self.quantity}.")
+
+    def save(self, *args, **kwargs):
+        """
+        Override save method to reduce stock in Storage upon successful sale.
+        """
+        if not self.pk:  # Only reduce stock on creation
+            self.item.quantity -= self.quantity
+            self.item.full_clean()  # Revalidate item to ensure stock doesn't go negative
+            self.item.save()
+        super().save(*args, **kwargs)
+
     def formatted_timestamp(self):
-        # Localized formatting
+        """
+        Localized formatting for timestamp.
+        """
         return self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    
+
+    class Meta:
+        verbose_name = "Sold Item"
+        verbose_name_plural = "Sold Items"
+        ordering = ['-timestamp']
